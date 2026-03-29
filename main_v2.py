@@ -3,24 +3,6 @@ import cv2
 import numpy as np
 from PIL import Image
 import io
-import base64
-
-# =======================================================
-# 🚨 Streamlitバグ回避 ＆ サーバーメモリ対策パッチ
-# =======================================================
-import streamlit_drawable_canvas
-
-def custom_image_to_url(image, width, clamp, channels, output_format, image_id, *args, **kwargs):
-    buffered = io.BytesIO()
-    if isinstance(image, np.ndarray):
-        image = Image.fromarray(image)
-    if image.mode != "RGB":
-        image = image.convert("RGB")
-    image.save(buffered, format="JPEG", quality=85)
-    img_str = base64.b64encode(buffered.getvalue()).decode()
-    return f"data:image/jpeg;base64,{img_str}"
-
-streamlit_drawable_canvas.st_image.image_to_url = custom_image_to_url
 from streamlit_drawable_canvas import st_canvas
 
 # ==========================================
@@ -28,7 +10,6 @@ from streamlit_drawable_canvas import st_canvas
 # ==========================================
 st.set_page_config(page_title="🕊️ My Personal Retouch V2", page_icon="🕊️")
 st.title("🕊️ 私だけの美肌アプリ Ver.2")
-st.markdown("### ~ 気になるところを指でなぞってね ~")
 
 def smooth_skin_flat(image, factor):
     if factor == 0:
@@ -41,14 +22,17 @@ def smooth_skin_flat(image, factor):
     smoothed = cv2.bilateralFilter(low_contrast, d, sigma, sigma)
     return smoothed
 
-# 写真アップロード
+# ==========================================
+# メイン処理
+# ==========================================
 uploaded_file = st.file_uploader("写真を選んでね", type=['png', 'jpg', 'jpeg'])
 
 if uploaded_file is not None:
-    # 念のためプログラム側でも20MB以上の巨大ファイルを弾く
+    # プログラム側でも20MB以上の巨大ファイルを弾く
     if uploaded_file.size > 20 * 1024 * 1024:
         st.error("⚠️ ファイルサイズが20MBを超えています。もう少し容量の小さい画像を選んでください。")
     else:
+        # 画像の読み込み
         original_image = Image.open(uploaded_file).convert("RGB")
         
         # 🚨 【メモリ対策】無料サーバーが爆発しないよう、最大1000pxに自動縮小
@@ -74,17 +58,17 @@ if uploaded_file is not None:
         canvas_width = 350
         canvas_height = int(canvas_width * (image.height / image.width))
 
-        # お絵かきキャンバスの配置
+        # お絵かきキャンバスの配置（余計なパッチなしの純正設定）
         canvas_result = st_canvas(
             fill_color="rgba(255, 255, 255, 0.5)",
             stroke_width=stroke_width,
             stroke_color="rgba(255, 255, 255, 0.5)",
-            background_image=image,
+            background_image=image, # ←普通に画像を渡すだけ！
             update_streamlit=True,
             height=canvas_height,
             width=canvas_width,
             drawing_mode="freedraw",
-            key="canvas_v2",
+            key="canvas_v2_clean",
         )
 
         if canvas_result.image_data is not None:
