@@ -3,21 +3,26 @@ import cv2
 import numpy as np
 from PIL import Image
 import io
+import base64
 
 # =======================================================
-# 🚨 Streamlit最新版のバグを強制突破する特効薬（モンキーパッチ）
+# 🚨 最終形態：Streamlitに依存せず、自分で画像をURL化する特効薬
 # =======================================================
 import streamlit_drawable_canvas
-try:
-    # Streamlit最新版で移動してしまった「画像処理の道具」の新しい住所を、
-    # お絵かきキャンバス部品の内部に直接教え込む（すり替える）魔法のコードです。
-    import streamlit.elements.lib.image_utils as core_image_utils
-    streamlit_drawable_canvas.st_image.image_to_url = core_image_utils.image_to_url
-except Exception:
-    pass
+
+def custom_image_to_url(image, width, clamp, channels, output_format, image_id, *args, **kwargs):
+    # Streamlitの内部機能を使わず、Pythonの標準機能だけで画像をBase64（URL形式）に変換する
+    buffered = io.BytesIO()
+    if isinstance(image, np.ndarray):
+        image = Image.fromarray(image)
+    image.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+    return f"data:image/png;base64,{img_str}"
+
+# キャンバス部品が内部で使う関数を、上の「自作関数」に完全にすり替える
+streamlit_drawable_canvas.st_image.image_to_url = custom_image_to_url
 
 from streamlit_drawable_canvas import st_canvas
-
 st.set_page_config(page_title="🕊️ My Personal Retouch", page_icon="🕊️")
 st.title("🕊️ 私だけの美肌アプリ")
 st.markdown("### ~ 気になるところを指でなぞってね ~")
