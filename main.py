@@ -3,6 +3,19 @@ import cv2
 import numpy as np
 from PIL import Image
 import io
+
+# =======================================================
+# 🚨 Streamlit最新版のバグを強制突破する特効薬（モンキーパッチ）
+# =======================================================
+import streamlit_drawable_canvas
+try:
+    # Streamlit最新版で移動してしまった「画像処理の道具」の新しい住所を、
+    # お絵かきキャンバス部品の内部に直接教え込む（すり替える）魔法のコードです。
+    import streamlit.elements.lib.image_utils as core_image_utils
+    streamlit_drawable_canvas.st_image.image_to_url = core_image_utils.image_to_url
+except Exception:
+    pass
+
 from streamlit_drawable_canvas import st_canvas
 
 st.set_page_config(page_title="🕊️ My Personal Retouch", page_icon="🕊️")
