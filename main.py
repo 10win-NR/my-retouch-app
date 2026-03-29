@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.elements.image as st_image
 if not hasattr(st_image, 'image_to_url'):
-    st_image.image_to_url = st_image._image_to_url  # ←ここを _image_to_url にする！
+    st_image.image_to_url = st_image.image_manager.image_to_url
 import cv2
 import numpy as np
 from PIL import Image
