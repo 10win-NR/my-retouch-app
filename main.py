@@ -54,14 +54,13 @@ if uploaded_file is not None:
 
     # お絵かきキャンバスの配置
     canvas_result = st_canvas(
-        fill_color="rgba(255, 255, 255, 0.5)",  # 塗ったところが半透明の白になる
+        fill_color="rgba(255, 255, 255, 0.5)",
         stroke_width=stroke_width,
         stroke_color="rgba(255, 255, 255, 0.5)",
-        background_image=image,
+        background_image=Image.open(uploaded_file),  # ←この1行を必ず入れる！
         update_streamlit=True,
-        height=canvas_height,
-        width=canvas_width,
-        drawing_mode="freedraw",  # 自由描画モード
+        height=400, # 必要に応じてサイズ調整
+        drawing_mode="freedraw",
         key="canvas",
     )
 
