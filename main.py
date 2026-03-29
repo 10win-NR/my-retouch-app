@@ -1,7 +1,4 @@
 import streamlit as st
-import streamlit.elements.image as st_image
-if not hasattr(st_image, 'image_to_url'):
-    st_image.image_to_url = lambda img, width, height, m, method, clamp, channels, output_format, image_id: "url"
 import cv2
 import numpy as np
 from PIL import Image
