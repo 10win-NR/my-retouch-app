@@ -46,20 +46,22 @@ if uploaded_file is not None:
     img_array = np.array(image)
     img_bgr = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
 
-    # スマホ画面でも塗りやすいように、表示用の幅を固定して高さを計算
-    canvas_width = 400
-    canvas_height = int(canvas_width * (image.height / image.width))
+    # スマホ画面でも塗りやすいように、表示用のサイズを調整
+    bg_image = Image.open(uploaded_file)
+    canvas_width = 600  # 表示幅を少し広めに固定
+    canvas_height = int(canvas_width * (bg_image.height / bg_image.width))
 
     st.write("👇 写真の美肌にしたい部分を指（マウス）で塗りつぶしてね")
 
-    # お絵かきキャンバスの配置
+    # お絵かきキャンバスの配置（ここを最新の設定に更新）
     canvas_result = st_canvas(
         fill_color="rgba(255, 255, 255, 0.5)",
         stroke_width=stroke_width,
         stroke_color="rgba(255, 255, 255, 0.5)",
-        background_image=Image.open(uploaded_file),  # ←この1行を必ず入れる！
+        background_image=bg_image,
         update_streamlit=True,
-        height=400, # 必要に応じてサイズ調整
+        height=canvas_height,
+        width=canvas_width,
         drawing_mode="freedraw",
         key="canvas",
     )
